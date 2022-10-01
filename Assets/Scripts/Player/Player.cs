@@ -6,6 +6,8 @@ using DG.Tweening;
 public class Player : MonoBehaviour
 {
     public Rigidbody2D rigidBody;
+    public HealthBase healthBase;
+    public BoxCollider2D collider;
 
     [Header("Keys")]
     public KeyCode leftKey = KeyCode.A;
@@ -28,6 +30,7 @@ public class Player : MonoBehaviour
 
     public string booleanWalk = "boolWalk";
     public string triggerJump = "triggerJump";
+    public string triggerDeath = "triggerDeath";
     public float animationSpeedRun = 2f;
     public float jumpStretchX = 0.7f;
     public float jumpStretchY = 1.2f;
@@ -36,7 +39,21 @@ public class Player : MonoBehaviour
     public float changeSideDuration = 0.2f;
 
     private float _currentSpeed;
+    private Coroutine _currentJumping;
 
+    private void Awake()
+    {
+        if (healthBase != null)
+            healthBase.OnKill += OnPlayerKill;
+    }
+
+    private void OnPlayerKill()
+    {
+        collider.enabled = false;
+        rigidBody.constraints = RigidbodyConstraints2D.FreezeAll;
+        healthBase.OnKill -= OnPlayerKill;
+        animator.SetTrigger(triggerDeath);
+    }
 
     private void Update()
     {
@@ -99,15 +116,25 @@ public class Player : MonoBehaviour
 
             rigidBody.velocity = new Vector2(rigidBody.velocity.x, jumpForce);
 
-            JumpAnimation();
+            if (_currentJumping == null)
+            {
+                _currentJumping = StartCoroutine(JumpAnimation());
+            }
         }
     }
 
-    private void JumpAnimation()
+    private IEnumerator JumpAnimation()
     {
         animator.SetTrigger(triggerJump);
         DOTween.Kill(rigidBody.transform);
         rigidBody.transform.DOScaleY(jumpStretchY, jumpStretchDuration).SetEase(jumpEaseAnimation).SetLoops(2, LoopType.Yoyo);
         rigidBody.transform.DOScaleX(rigidBody.transform.localScale.x * jumpStretchX, jumpStretchDuration).SetEase(jumpEaseAnimation).SetLoops(2, LoopType.Yoyo);
+        yield return new WaitForSeconds(jumpStretchDuration*2);
+        _currentJumping = null;
+    }
+
+    public void DestroyMe()
+    {
+        Destroy(gameObject);
     }
 }
