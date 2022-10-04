@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class ItemManager : Singleton<ItemManager>
 {
-    public CoinsTracker coinsTracker;
-
-    public int coins;
+    public SOInt coins;
+    public SOInt life;
 
     protected override void Awake()
     {
@@ -17,13 +16,17 @@ public class ItemManager : Singleton<ItemManager>
 
     private void Reset()
     {
-        coins = 0;
-        coinsTracker.UpdateText(coins);
+        coins.SetValue(0);
+        life.SetValue(0);
     }
 
     public void AddCoins(int amount = 1)
     {
-        coins += amount;
-        coinsTracker.UpdateText(coins);
+        coins.AddValue(amount);
+    }
+
+    public void AddLife(int amount =1)
+    {
+        life.AddValue(amount);
     }
 }

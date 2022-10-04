@@ -5,39 +5,12 @@ using DG.Tweening;
 
 public class Player : MonoBehaviour
 {
-    public Rigidbody2D rigidBody;
     public HealthBase healthBase;
+    public SO_PlayerSetup so_PlayerSetup;
+    public Rigidbody2D rigidBody;
     public BoxCollider2D collider;
 
-    [Header("Keys")]
-    public KeyCode leftKey = KeyCode.A;
-    public KeyCode rightKey = KeyCode.D;
-    public KeyCode jumpKey = KeyCode.W;
-    public KeyCode runKey = KeyCode.LeftShift;
-
-
-    [Header("Movement")]
-    public float speed = 10f;
-    public float speedRun = 20f;
-    public float jumpForce = 15;
-
-    [Header("Physics")]
-    public Vector2 friction = new Vector2(0.1f, 0f);
-
-
-    [Header("Animation")]
-    public Animator animator;
-
-    public string booleanWalk = "boolWalk";
-    public string triggerJump = "triggerJump";
-    public string triggerDeath = "triggerDeath";
-    public float animationSpeedRun = 2f;
-    public float jumpStretchX = 0.7f;
-    public float jumpStretchY = 1.2f;
-    public float jumpStretchDuration = 0.2f;
-    public Ease jumpEaseAnimation = Ease.OutBack;
-    public float changeSideDuration = 0.2f;
-
+    private Animator _currentPlayer;
     private float _currentSpeed;
     private Coroutine _currentJumping;
 
@@ -45,6 +18,9 @@ public class Player : MonoBehaviour
     {
         if (healthBase != null)
             healthBase.OnKill += OnPlayerKill;
+
+        _currentPlayer = Instantiate(so_PlayerSetup.Player, transform);
+        GetComponentInChildren<GunBase>().playerReference = this.transform;
     }
 
     private void OnPlayerKill()
@@ -52,7 +28,7 @@ public class Player : MonoBehaviour
         collider.enabled = false;
         rigidBody.constraints = RigidbodyConstraints2D.FreezeAll;
         healthBase.OnKill -= OnPlayerKill;
-        animator.SetTrigger(triggerDeath);
+        _currentPlayer.SetTrigger(so_PlayerSetup.triggerDeath);
     }
 
     private void Update()
@@ -63,58 +39,58 @@ public class Player : MonoBehaviour
 
     private void HandleMovement()
     {
-        if (Input.GetKey(runKey))
+        if (Input.GetKey(so_PlayerSetup.runKey))
         {
-            _currentSpeed = speedRun;
-            animator.speed = animationSpeedRun;
+            _currentSpeed = so_PlayerSetup.speedRun;
+            _currentPlayer.speed = so_PlayerSetup.animationSpeedRun;
         }
         else
         {
-            _currentSpeed = speed;
-            animator.speed = 1f;
+            _currentSpeed = so_PlayerSetup.speed;
+            _currentPlayer.speed = 1f;
         }
 
 
 
-        if (Input.GetKey(leftKey))
+        if (Input.GetKey(so_PlayerSetup.leftKey))
         {
             rigidBody.velocity = new Vector2(-_currentSpeed, rigidBody.velocity.y);
             if (rigidBody.transform.localScale.x != -1)
             {
-                rigidBody.transform.DOScaleX(-1, changeSideDuration);
+                rigidBody.transform.DOScaleX(-1, so_PlayerSetup.changeSideDuration);
             }
-            animator.SetBool(booleanWalk, true);
+            _currentPlayer.SetBool(so_PlayerSetup.booleanWalk, true);
         }
-        else if (Input.GetKey(rightKey))
+        else if (Input.GetKey(so_PlayerSetup.rightKey))
         {
             rigidBody.velocity = new Vector2(_currentSpeed, rigidBody.velocity.y);
             if (rigidBody.transform.localScale.x != 1)
             {
-                rigidBody.transform.DOScaleX(1, changeSideDuration);
+                rigidBody.transform.DOScaleX(1, so_PlayerSetup.changeSideDuration);
             }
-            animator.SetBool(booleanWalk, true);
+            _currentPlayer.SetBool(so_PlayerSetup.booleanWalk, true);
         }
         else
         {
-            animator.SetBool(booleanWalk, false);
+            _currentPlayer.SetBool(so_PlayerSetup.booleanWalk, false);
         }
 
         if (rigidBody.velocity.x > 0)
         {
-            rigidBody.velocity -= friction;
+            rigidBody.velocity -= so_PlayerSetup.friction;
         }
         else if (rigidBody.velocity.x < 0)
         {
-            rigidBody.velocity += friction;
+            rigidBody.velocity += so_PlayerSetup.friction;
         }
     }
 
     private void HandleJump()
     {
-        if (Input.GetKeyDown(jumpKey))
+        if (Input.GetKeyDown(so_PlayerSetup.jumpKey))
         {
 
-            rigidBody.velocity = new Vector2(rigidBody.velocity.x, jumpForce);
+            rigidBody.velocity = new Vector2(rigidBody.velocity.x, so_PlayerSetup.jumpForce);
 
             if (_currentJumping == null)
             {
@@ -125,11 +101,11 @@ public class Player : MonoBehaviour
 
     private IEnumerator JumpAnimation()
     {
-        animator.SetTrigger(triggerJump);
+        _currentPlayer.SetTrigger(so_PlayerSetup.triggerJump);
         DOTween.Kill(rigidBody.transform);
-        rigidBody.transform.DOScaleY(jumpStretchY, jumpStretchDuration).SetEase(jumpEaseAnimation).SetLoops(2, LoopType.Yoyo);
-        rigidBody.transform.DOScaleX(rigidBody.transform.localScale.x * jumpStretchX, jumpStretchDuration).SetEase(jumpEaseAnimation).SetLoops(2, LoopType.Yoyo);
-        yield return new WaitForSeconds(jumpStretchDuration*2);
+        rigidBody.transform.DOScaleY(so_PlayerSetup.jumpStretchY, so_PlayerSetup.jumpStretchDuration).SetEase(so_PlayerSetup.jumpEaseAnimation).SetLoops(2, LoopType.Yoyo);
+        rigidBody.transform.DOScaleX(rigidBody.transform.localScale.x * so_PlayerSetup.jumpStretchX, so_PlayerSetup.jumpStretchDuration).SetEase(so_PlayerSetup.jumpEaseAnimation).SetLoops(2, LoopType.Yoyo);
+        yield return new WaitForSeconds(so_PlayerSetup.jumpStretchDuration *2);
         _currentJumping = null;
     }
 
