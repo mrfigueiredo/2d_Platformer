@@ -19,7 +19,7 @@ MonoBehaviour:
   runKey: 304
   speed: 10
   speedRun: 20
-  jumpForce: 25
+  jumpForce: 30
   friction: {x: 0.5, y: 0}
   booleanWalk: boolWalk
   triggerJump: triggerJump
@@ -30,3 +30,5 @@ MonoBehaviour:
   jumpStretchDuration: 0.2
   jumpEaseAnimation: 27
   changeSideDuration: 0.2
+  distToGround: 0.5
+  canDoubleJump: 1

@@ -9,10 +9,17 @@ public class Player : MonoBehaviour
     public SO_PlayerSetup so_PlayerSetup;
     public Rigidbody2D rigidBody;
     public BoxCollider2D collider;
+    public LayerMask raycastMask;
+
+    [Header("VFX")]
+    public ParticleSystem runningDustVFX;
+    public ParticleSystem jumpVFX;
 
     private Animator _currentPlayer;
     private float _currentSpeed;
     private Coroutine _currentJumping;
+    private bool _isSecondJump = false;
+    private bool _isGrounded = false;
 
     private void Awake()
     {
@@ -21,6 +28,12 @@ public class Player : MonoBehaviour
 
         _currentPlayer = Instantiate(so_PlayerSetup.Player, transform);
         GetComponentInChildren<GunBase>().playerReference = this.transform;
+
+    }
+
+    private bool IsGrounded()
+    {
+        return ( Physics2D.OverlapCircleAll(transform.position, so_PlayerSetup.distToGround, raycastMask).Length > 0 ? true : false) ;
     }
 
     private void OnPlayerKill()
@@ -35,6 +48,22 @@ public class Player : MonoBehaviour
     {
         HandleJump();
         HandleMovement();
+        HandleDustVFX();
+    }
+
+    private void HandleDustVFX()
+    {
+        if (runningDustVFX == null)
+            return;
+
+        if (_isGrounded && runningDustVFX.isStopped)
+        {
+            runningDustVFX.Play();
+        }
+        else if(!_isGrounded && runningDustVFX.isPlaying)
+        {
+            runningDustVFX.Stop();
+        }
     }
 
     private void HandleMovement()
@@ -87,16 +116,42 @@ public class Player : MonoBehaviour
 
     private void HandleJump()
     {
+        _isGrounded = IsGrounded();
+
         if (Input.GetKeyDown(so_PlayerSetup.jumpKey))
         {
-
-            rigidBody.velocity = new Vector2(rigidBody.velocity.x, so_PlayerSetup.jumpForce);
-
-            if (_currentJumping == null)
+            if (_isGrounded)
             {
-                _currentJumping = StartCoroutine(JumpAnimation());
+                Jump();
+                _isSecondJump = true;
+            }
+            else if ((!_isGrounded && _isSecondJump && so_PlayerSetup.canDoubleJump))
+            {
+                Jump();
+                _isSecondJump = false;
             }
         }
+    }
+
+    private void Jump()
+    {
+        HandleJumpVFX();
+
+        rigidBody.velocity = new Vector2(rigidBody.velocity.x, so_PlayerSetup.jumpForce);
+
+        if (_currentJumping == null)
+        {
+            _currentJumping = StartCoroutine(JumpAnimation());
+        }
+
+    }
+
+    private void HandleJumpVFX()
+    {
+        if (jumpVFX == null)
+            return;
+
+        jumpVFX.Play();
     }
 
     private IEnumerator JumpAnimation()
@@ -105,7 +160,7 @@ public class Player : MonoBehaviour
         DOTween.Kill(rigidBody.transform);
         rigidBody.transform.DOScaleY(so_PlayerSetup.jumpStretchY, so_PlayerSetup.jumpStretchDuration).SetEase(so_PlayerSetup.jumpEaseAnimation).SetLoops(2, LoopType.Yoyo);
         rigidBody.transform.DOScaleX(rigidBody.transform.localScale.x * so_PlayerSetup.jumpStretchX, so_PlayerSetup.jumpStretchDuration).SetEase(so_PlayerSetup.jumpEaseAnimation).SetLoops(2, LoopType.Yoyo);
-        yield return new WaitForSeconds(so_PlayerSetup.jumpStretchDuration *2);
+        yield return new WaitForSeconds(so_PlayerSetup.jumpStretchDuration * 2);
         _currentJumping = null;
     }
 

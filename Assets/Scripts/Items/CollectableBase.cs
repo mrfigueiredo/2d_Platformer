@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CollectableBase : MonoBehaviour
 {
+    public ParticleSystem vfxPrefab;
     public string tagToCompare = "Player";
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -18,5 +19,9 @@ public class CollectableBase : MonoBehaviour
         OnCollect();
     }
 
-    protected virtual void OnCollect() { }
+    protected virtual void OnCollect()
+    {
+        if (vfxPrefab != null)
+            vfxPrefab.Play();
+    }
 }

@@ -9,10 +9,18 @@ public class ProjectileBase : MonoBehaviour
     public float side = 1;
     public int damageAmount = 10;
 
+    public GameObject bullet;
+
+    [Header("VFX")]
+    public ParticleSystem shootVFX;
+    public ParticleSystem hitVFX;
+
     private string playerTag = "Player";
 
     private void Awake()
     {
+        if(shootVFX!= null)
+            shootVFX.Play();
         Destroy(gameObject, timeToLive);
     }
 
@@ -31,8 +39,20 @@ public class ProjectileBase : MonoBehaviour
         if (enemy != null)
         {
             enemy.Damage(damageAmount);
+            if (hitVFX != null)
+            {
+                hitVFX.Play();
+                Destroy(bullet);
+                Destroy(gameObject, hitVFX.main.duration);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
-
-        Destroy(gameObject);
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 }

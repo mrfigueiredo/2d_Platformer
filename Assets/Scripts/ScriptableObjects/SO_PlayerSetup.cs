@@ -35,4 +35,7 @@ public class SO_PlayerSetup : ScriptableObject
     public Ease jumpEaseAnimation = Ease.OutBack;
     public float changeSideDuration = 0.2f;
 
+    [Header("Jump Setting")]
+    public float distToGround = 0.5f;
+    public bool canDoubleJump = true;
 }

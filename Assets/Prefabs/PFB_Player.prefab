@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 7706363231004596427}
   - component: {fileID: 7706363231004596426}
   - component: {fileID: 1604162222}
-  - component: {fileID: 6883295101329883330}
   m_Layer: 0
   m_Name: PFB_Player
   m_TagString: Player
@@ -71,7 +70,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   healthBase: {fileID: 7706363231004596424}
-  so_PlayerSetup: {fileID: 0}
+  so_PlayerSetup: {fileID: 11400000, guid: da44000eead64764b9ff03f31d6cf93c, type: 2}
   rigidBody: {fileID: 7706363231004596436}
   collider: {fileID: 7706363231004596427}
 --- !u!114 &7706363231004596424
@@ -141,16 +140,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damageColor: {r: 0.8584906, g: 0.5075353, b: 0.5075353, a: 1}
   flashDuration: 0.1
---- !u!114 &6883295101329883330
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7706363231004596438}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e4dc49d5d4b8684a986bdb283abe383, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: {fileID: 7706363231004596437}
