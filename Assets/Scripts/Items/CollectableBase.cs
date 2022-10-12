@@ -6,6 +6,10 @@ public class CollectableBase : MonoBehaviour
 {
     public ParticleSystem vfxPrefab;
     public string tagToCompare = "Player";
+
+    [Header("Audio")]
+    public AudioSource audioSource;
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.transform.CompareTag(tagToCompare))
@@ -23,5 +27,8 @@ public class CollectableBase : MonoBehaviour
     {
         if (vfxPrefab != null)
             vfxPrefab.Play();
+
+        if (audioSource != null)
+            audioSource.Play();
     }
 }

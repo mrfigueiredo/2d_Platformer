@@ -13,6 +13,10 @@ public class EnemyBase : MonoBehaviour
     public string triggerAttack = "triggerAttack";
     public string triggerDeath = "triggerDeath";
 
+    [Header("Audio")]
+    public AudioSource enemyHit;
+    public AudioSource enemyDying;
+
     private void Awake()
     {
         if (healthBase != null)
@@ -32,7 +36,7 @@ public class EnemyBase : MonoBehaviour
 
     private void OnEnemyKill()
     {
-
+        DeathSound();
         DeathAnimation();
         healthBase.OnKill -= OnEnemyKill;
 
@@ -41,6 +45,7 @@ public class EnemyBase : MonoBehaviour
     private void AttackAnimation()
     {
         animator.SetTrigger(triggerAttack);
+        AttackSound();
     }
     private void DeathAnimation()
     {
@@ -49,5 +54,17 @@ public class EnemyBase : MonoBehaviour
     public void Damage(int amount)
     {
         healthBase.Damage(amount);
+    }
+
+    private void AttackSound()
+    {
+        if (enemyHit != null && enemyHit.clip != null)
+            enemyHit.Play();
+    }
+
+    private void DeathSound()
+    {
+        if (enemyDying != null && enemyDying.clip != null)
+            enemyDying.Play();
     }
 }

@@ -8,7 +8,7 @@ public class PlayerDestroyerHelper : MonoBehaviour
 
     private void Awake()
     {
-        if(player == null)
+        if (player == null)
         {
             player = GetComponentInParent<Player>();
         }
@@ -16,6 +16,13 @@ public class PlayerDestroyerHelper : MonoBehaviour
 
     public void DestroyPlayer()
     {
-        player.DestroyMe();
+        if (player != null)
+            player.DestroyMe();
+    }
+
+    public void PlayerDeathEvent()
+    {
+        if (player != null)
+            player.DeathEvent();
     }
 }

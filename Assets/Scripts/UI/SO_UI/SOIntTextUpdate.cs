@@ -1,9 +1,5 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class SOIntTextUpdate : MonoBehaviour
 {
@@ -29,4 +25,5 @@ public class SOIntTextUpdate : MonoBehaviour
     {
         textMeshProUGUI.text = "x " + amount;
     }
+
 }

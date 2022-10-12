@@ -15,6 +15,9 @@ public class ProjectileBase : MonoBehaviour
     public ParticleSystem shootVFX;
     public ParticleSystem hitVFX;
 
+    [Header("Audio")]
+    public AudioSource source;
+
     private string playerTag = "Player";
 
     private void Awake()
@@ -43,16 +46,23 @@ public class ProjectileBase : MonoBehaviour
             {
                 hitVFX.Play();
                 Destroy(bullet);
-                Destroy(gameObject, hitVFX.main.duration);
+                OnHitDestroy(hitVFX.main.duration);
             }
             else
             {
-                Destroy(gameObject);
+                OnHitDestroy();
             }
         }
         else
         {
-            Destroy(gameObject);
+            OnHitDestroy();
         }
+    }
+
+    private void OnHitDestroy(float timeToDestroy = 0)
+    {
+        if (source != null && source.clip != null)
+            source.Play();
+        Destroy(gameObject, timeToDestroy);
     }
 }

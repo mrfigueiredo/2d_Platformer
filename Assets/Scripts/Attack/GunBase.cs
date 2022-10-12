@@ -12,6 +12,9 @@ public class GunBase : MonoBehaviour
 
     public Transform playerReference;
 
+    [Header("Audio")]
+    public AudioGunSFX gunSFX;
+
     private Coroutine _currentShooting;
 
     private void Update()
@@ -32,6 +35,8 @@ public class GunBase : MonoBehaviour
 
     public void Shoot()
     {
+        if (gunSFX != null)
+            gunSFX.ShootSound();
         var projectile = Instantiate(projectileBase);
         projectile.transform.position = shootPosition.position;
         projectile.side = playerReference.transform.localScale.x;

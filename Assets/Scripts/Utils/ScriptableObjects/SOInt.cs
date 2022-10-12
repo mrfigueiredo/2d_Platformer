@@ -19,8 +19,13 @@ public class SOInt : ScriptableObject, ISerializationCallbackReceiver
     {
         value = newValue;
         ChangeEvent(value);
-
     }
+
+    public int GetValue()
+    {
+        return value;
+    }
+
     public void AddValue(int addValue)
     {
         value += addValue;

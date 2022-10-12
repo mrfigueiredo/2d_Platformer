@@ -1,7 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using DG.Tweening;
+using System.Collections;
+using UnityEngine;
+using UnityEngine.Events;
 
 public class Player : MonoBehaviour
 {
@@ -15,11 +15,17 @@ public class Player : MonoBehaviour
     public ParticleSystem runningDustVFX;
     public ParticleSystem jumpVFX;
 
+    [Header("Audio")]
+    public AudioSource playerDeathSound;
+
     private Animator _currentPlayer;
     private float _currentSpeed;
     private Coroutine _currentJumping;
     private bool _isSecondJump = false;
     private bool _isGrounded = false;
+
+    [HideInInspector]
+    public UnityAction<int> OnDeathEvent;
 
     private void Awake()
     {
@@ -33,15 +39,24 @@ public class Player : MonoBehaviour
 
     private bool IsGrounded()
     {
-        return ( Physics2D.OverlapCircleAll(transform.position, so_PlayerSetup.distToGround, raycastMask).Length > 0 ? true : false) ;
+        return (Physics2D.OverlapCircleAll(transform.position, so_PlayerSetup.distToGround, raycastMask).Length > 0 ? true : false);
     }
 
     private void OnPlayerKill()
     {
+        PlayerDyingSound();
         collider.enabled = false;
         rigidBody.constraints = RigidbodyConstraints2D.FreezeAll;
         healthBase.OnKill -= OnPlayerKill;
         _currentPlayer.SetTrigger(so_PlayerSetup.triggerDeath);
+    }
+
+
+
+    private void PlayerDyingSound()
+    {
+        if (playerDeathSound != null && playerDeathSound.clip != null)
+            playerDeathSound.Play();
     }
 
     private void Update()
@@ -60,7 +75,7 @@ public class Player : MonoBehaviour
         {
             runningDustVFX.Play();
         }
-        else if(!_isGrounded && runningDustVFX.isPlaying)
+        else if (!_isGrounded && runningDustVFX.isPlaying)
         {
             runningDustVFX.Stop();
         }
@@ -68,10 +83,16 @@ public class Player : MonoBehaviour
 
     private void HandleMovement()
     {
-        if (Input.GetKey(so_PlayerSetup.runKey))
+
+        if (Input.GetKey(so_PlayerSetup.runKey) && _isGrounded)
         {
             _currentSpeed = so_PlayerSetup.speedRun;
             _currentPlayer.speed = so_PlayerSetup.animationSpeedRun;
+        }
+        else if (Input.GetKey(so_PlayerSetup.runKey) && !_isGrounded)
+        {
+            _currentSpeed = so_PlayerSetup.speedRun;
+            _currentPlayer.speed = 1f;
         }
         else
         {
@@ -167,5 +188,10 @@ public class Player : MonoBehaviour
     public void DestroyMe()
     {
         Destroy(gameObject);
+    }
+
+    public void DeathEvent()
+    {
+        OnDeathEvent?.Invoke(0);
     }
 }
